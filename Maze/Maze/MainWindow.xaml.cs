@@ -22,10 +22,11 @@ namespace Maze
     {
         private Maze_Grid[,] g;
         private Player A;
+        private Rectangle P;
         public MainWindow()
         {
             InitializeComponent();
-            init(30, 26);
+            entry();
         }
         private class Point
         {
@@ -48,24 +49,63 @@ namespace Maze
             }
         }
 
-        private class Maze_Grid:Point
+        private class Maze_Grid : Point
         {
             public bool isConnected { set; get; }
             public bool Visited { get; set; }
             public Maze_Grid(int xi, int yi) : base(xi, yi) { }
         }
 
-        private class Player:Point
+        private class Player : Point
         {
-            public Player(int xi, int yi) : base(xi, xi) { }
+            private int xout;
+            private int yout;
+            public double xstep { get; set; } // x轴上的步长
+            public double ystep { get; set; } // y轴上的步长
             public void MoveToLeft() { x = x - 1; }
             public void MoveToTop() { y = y - 1; }
             public void MoveToRight() { x = x + 1; }
             public void MoveToBottom() { y = y + 1; }
+            public Player(int xi, int yi, int xo, int yo) : base(xi, xi) { xout = xo; yout = yo; }
+            public bool IsOut()
+            {
+                if (x == xout && y == yout) return true;
+                else return false;
+            }
         }
 
-        private void init(int Columns, int Rows)
+        // 第一次进入游戏
+        private void entry()
         {
+            // 先介绍游戏规则
+            About_Click(about, null);
+            // 进行难度选择
+            DifficultySelect d1 = new DifficultySelect(this);
+            d1.ShowDialog();
+        }
+
+        // 初始化迷宫游戏
+        public void init(int difficulty)
+        {
+            // 根据难度确定迷宫大小
+            int Columns = 0, Rows = 0;
+            switch (difficulty)
+            {
+                case 0:
+                    Columns = 13;
+                    Rows = 9;
+                    break;
+                case 1:
+                    Columns = 17;
+                    Rows = 13;
+                    break;
+                case 2:
+                    Columns = 31;
+                    Rows = 21;
+                    break;
+                default:
+                    break;
+            }
             // 对网格初始化
             initGrid(Columns, Rows);
             // 用深度优先遍历法生成迷宫形状
@@ -73,8 +113,33 @@ namespace Maze
             // 画出迷宫
             drawMaze(Columns, Rows);
             // 初始化玩家
-            A = new Player(1,1);
+            initPlayer(1, 1, Columns, Rows);
+            // 初始化终点
+            initEnd(Columns, Rows);
         }
+
+        // 初始化终点
+        private void initEnd(int Columns, int Rows)
+        {
+            Rectangle E = new Rectangle();
+            E.Fill = Brushes.Black;
+            Thickness end = new Thickness(E.Margin.Left + (Columns - 2) * A.xstep, E.Margin.Top + (Rows - 2) * A.ystep, E.Margin.Left - (Columns - 2) * A.xstep, E.Margin.Top - (Rows - 2) * A.ystep);
+            E.Margin = end;
+            Maze.Children.Add(E);
+        }
+
+        // 初始化玩家
+        private void initPlayer(int x, int y, int Columns, int Rows)
+        {
+            A = new Player(x, y, Columns-2, Rows-2);
+            A.xstep = Maze.Width / Columns;
+            A.ystep = Maze.Height / Rows;
+            P = new Rectangle();
+            P.Fill = Brushes.Blue;
+            Thickness start = new Thickness(P.Margin.Left + A.xstep, P.Margin.Top + A.ystep, P.Margin.Right - A.xstep, P.Margin.Bottom - A.ystep);
+            P.Margin = start;
+            Maze.Children.Add(P);
+        } 
 
         // 对网格初始化
         private void initGrid(int Columns, int Rows)
@@ -97,7 +162,7 @@ namespace Maze
                         g[i, j].Visited = false;
                         g[i, j].isConnected = false;
                     }
-                    else
+                    else // 待打通的网格
                     {
                         g[i, j].Visited = false;
                         g[i, j].isConnected = true;
@@ -115,12 +180,24 @@ namespace Maze
             while (st.Count != 0)
             {
                 Maze_Grid e = st.Pop(); // 出栈
-                int[] direction = { 1, 2, 3, 4 }; // 分别代表左、上、右、下四个方向
+                int[] direction = new int[4]; //  1, 2, 3, 4 分别代表左、上、右、下四个方向
                 // 打乱数组
-                int rand = rd.Next(1, 4);
-                int temp = direction[rand];
-                direction[rand] = direction[0];
-                direction[0] = temp;
+                int j = 0;
+                bool exist = false;
+                while (j < 4)
+                {
+                    exist = false;
+                    int rand = rd.Next(1, 5);
+                    foreach(int k in direction)
+                    {
+                        if (k == rand) exist = true;
+                    }
+                    if (!exist)
+                    {
+                        direction[j] = rand;
+                        j++;
+                    }
+                }
                 foreach(int i in direction)
                 {
                     switch (i)
@@ -162,6 +239,21 @@ namespace Maze
                     }
                 }
             }
+            // 去除边缘多余的墙
+            if (xo % 2 == 0)
+            {
+                for (int i = 1;  i < yo; i++)
+                {
+                    if (g[xo - 3, i].isConnected == true) g[xo-2, i].isConnected = true;
+                }
+            }
+            if (yo % 2 == 0)
+            {
+                for (int i = 1; i < xo; i++)
+                {
+                    if (g[i, yo - 3].isConnected == true) g[i, yo - 2].isConnected = true;
+                }
+            }
         }
 
         // 画出迷宫
@@ -172,7 +264,7 @@ namespace Maze
                 for (int j = 0; j < Rows; j++)
                 {
                     TextBlock newArea = new TextBlock();
-                     newArea.Text = i.ToString() + "," + j.ToString(); // 标出迷宫坐标
+                    //newArea.Text = i.ToString() + "," + j.ToString(); // 标出迷宫坐标
                     Maze.Children.Add(newArea);
                     Grid.SetColumn(newArea, i);
                     Grid.SetRow(newArea, j);
@@ -186,28 +278,72 @@ namespace Maze
         {
             Maze.ColumnDefinitions.RemoveRange(0, g.GetLength(0));
             Maze.RowDefinitions.RemoveRange(0,g.GetLength(1));
-            init(15, 13);
+            // 进行难度选择
+            DifficultySelect d1 = new DifficultySelect(this);
+            d1.ShowDialog();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.Left))
+            Thickness move;
+            if (Keyboard.IsKeyDown(Key.Left)) // 左方向键
             {
-                A.MoveToLeft();
+                if (g[A.X-1,A.Y].isConnected == true)
+                {
+                    move = new Thickness(P.Margin.Left - A.xstep, P.Margin.Top, P.Margin.Right + A.xstep, P.Margin.Bottom);
+                    A.MoveToLeft();
+                    P.Margin = move;
+                }
             }
-            else if (Keyboard.IsKeyDown(Key.Up))
+            else if (Keyboard.IsKeyDown(Key.Up)) // 上方向键
             {
-                A.MoveToTop();
+                if (g[A.X, A.Y-1].isConnected == true)
+                {
+                    move = new Thickness(P.Margin.Left, P.Margin.Top - A.ystep, P.Margin.Right, P.Margin.Bottom + A.ystep);
+                    A.MoveToTop();
+                    P.Margin = move;
+                }
             }
-            else if (Keyboard.IsKeyDown(Key.Right))
+            else if (Keyboard.IsKeyDown(Key.Right)) // 右方向键
             {
-                A.MoveToRight();
+                if (g[A.X + 1, A.Y].isConnected == true)
+                {
+                    move = new Thickness(P.Margin.Left + A.xstep, P.Margin.Top, P.Margin.Right - A.xstep, P.Margin.Bottom);
+                    A.MoveToRight();
+                    P.Margin = move;
+                }
             }
-            else if (Keyboard.IsKeyDown(Key.Down))
+            else if (Keyboard.IsKeyDown(Key.Down)) // 下方向键
             {
-                A.MoveToBottom();
+                if (g[A.X, A.Y+1].isConnected == true)
+                {
+                    move = new Thickness(P.Margin.Left, P.Margin.Top + A.ystep, P.Margin.Right, P.Margin.Bottom - A.ystep);
+                    A.MoveToBottom();
+                    P.Margin = move;
+                }
             }
-            MessageBox.Show(A.X.ToString() + A.Y.ToString());
+            if (A.IsOut() == true) MessageBox.Show(A.X.ToString() + "," + A.Y.ToString());
+        }
+
+        // 退出程序
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        // 规则
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            About d1 = new About();
+            d1.ShowDialog();
+        }
+
+        // 排行榜
+        private void Rank_Click(object sender, RoutedEventArgs e)
+        {
+            RankList d1 = new RankList();
+            d1.Owner = this;
+            d1.ShowDialog();
         }
     }
 }

@@ -1,0 +1,17 @@
+﻿<Window x:Class="Maze.DifficultySelect"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Maze"
+        mc:Ignorable="d"
+        Title="DifficultySelect" Height="300" Width="500">
+    <Grid>
+        <Label Content="请选择难度" HorizontalAlignment="Left" Margin="147,52,0,0" VerticalAlignment="Top" FontSize="36"/>
+        <Canvas>
+            <Button Name="difficult" Width="100px" Height="30px" FontSize="16" Click="Button_Click" Canvas.Left="343" Canvas.Top="171">困难</Button>
+            <Button Name="middle" Width="100px" Height="30px" FontSize="16" Click="Button_Click" Canvas.Left="202" Canvas.Top="171">中等</Button>
+            <Button Name="eazy" Width="100px" Height="30px" FontSize="16" Click="Button_Click" Canvas.Left="61" Canvas.Top="171">简单</Button>
+        </Canvas>
+    </Grid>
+</Window>

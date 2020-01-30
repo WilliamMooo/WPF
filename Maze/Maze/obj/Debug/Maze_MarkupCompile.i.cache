@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\Desktop\maze\Maze\Maze\obj\Debug\
+D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\
 Maze
 none
 false
 DEBUG;TRACE
-D:\Desktop\maze\Maze\Maze\App.xaml
-11151548125
+D:\Desktop\maze\WPF\Maze\Maze\App.xaml
+4-270770070
 
-9542078401
+121446194646
 131569487696
-MainWindow.xaml;
+About.xaml;DifficultySelect.xaml;MainWindow.xaml;RankList.xaml;
 
-True
+False
 

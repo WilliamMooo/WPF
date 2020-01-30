@@ -1,0 +1,16 @@
+﻿<Window x:Class="Maze.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Maze"
+        mc:Ignorable="d"
+        Title="About" Height="300" Width="400">
+    <Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="128,26,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" FontSize="36">游戏规则</TextBlock>
+        <TextBlock HorizontalAlignment="Left" Margin="48,79,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="16" Width="312">
+            限时1分钟，使用键盘方向键控制玩家，在迷宫中达到终点，最终得分根据剩余时间和迷宫难度确定。简单难度系数为1，中等难度系数为2，困难难度系数为3。得分=难度系数*剩余时间。
+        </TextBlock>
+        <Button Width="150px" Height="30px" FontSize="16" Margin="96,206,96,24" Click="Button_Click">确定</Button>
+    </Grid>
+</Window>

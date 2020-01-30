@@ -5,21 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Maze"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown">
+        Title="MainWindow" Height="500px" Width="850px" KeyDown="Window_KeyDown">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="274*"/>
-            <ColumnDefinition Width="9*"/>
-            <ColumnDefinition Width="113*"/>
-        </Grid.ColumnDefinitions>
-        <Grid Name="Maze" Width="550px" Height="350px" Margin="19,40,223,30" ShowGridLines="True" Grid.ColumnSpan="3">
+        <Grid Name="Maze" Width="550px" Height="420px" Margin="30,30,262,20">
             <Grid.RowDefinitions>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
             </Grid.ColumnDefinitions>
         </Grid>
-        <Grid Width="200px" Margin="16,0,10,0" Grid.Column="2">
-            <Button Name="recreate" Height="100px" Click="Recreate_Click">重新生成迷宫</Button>
-        </Grid>
+        <Canvas Width="200px" Margin="607,-6,35,6">
+            <TextBlock Margin="0,31,0,387" FontSize="36">迷宫游戏</TextBlock>
+            <Grid>
+                <Label Margin="0,88,0,351" FontSize="14">玩家所在位置</Label>
+                <Rectangle Width="18px" Fill="Blue" Margin="98,92,83,358"/>
+            </Grid>
+            <Grid>
+                <Label Margin="0,116,0,323" FontSize="14">墙(不可穿越)</Label>
+                <Rectangle Fill="Red" Margin="98,119,83,331" Width="18px"/>
+            </Grid>
+            <Grid>
+                <Label Margin="0,143,0,296" FontSize="14">道路(可穿越)</Label>
+                <Rectangle Fill="Yellow" Margin="98,150,83,300" Width="18px"/>
+            </Grid>
+            <Label Margin="0,185,0,254">倒计时(秒)：</Label>
+            <Label Name="time" Margin="69,185,-59,254">0</Label>
+            <Button Name="rank" Width="200px" Height="40px" Click="Rank_Click" Margin="0,225,0,184">排行榜</Button>
+            <Button Name="recreate" Width="200px" Height="40px" Click="Recreate_Click" Margin="0,285,0,133">重新开始</Button>
+            <Button Name="about" Width="200px" Height="40px" Click="About_Click" Margin="0,345,0,72">说明</Button>
+            <Button Name="exit" Width="200px" Height="40px" Click="Exit_Click" Margin="0,405,0,16">退出</Button>
+        </Canvas>
     </Grid>
 </Window>
