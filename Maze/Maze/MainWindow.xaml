@@ -1,0 +1,25 @@
+﻿<Window x:Class="Maze.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Maze"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="274*"/>
+            <ColumnDefinition Width="9*"/>
+            <ColumnDefinition Width="113*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Name="Maze" Width="550px" Height="350px" Margin="19,40,223,30" ShowGridLines="True" Grid.ColumnSpan="3">
+            <Grid.RowDefinitions>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+            </Grid.ColumnDefinitions>
+        </Grid>
+        <Grid Width="200px" Margin="16,0,10,0" Grid.Column="2">
+            <Button Name="recreate" Height="100px" Click="Recreate_Click">重新生成迷宫</Button>
+        </Grid>
+    </Grid>
+</Window>
