@@ -28,9 +28,9 @@ namespace Maze
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (sender == difficult) mainWindow.init(2);
-            else if (sender == middle) mainWindow.init(1);
-            else if (sender == eazy) mainWindow.init(0);
+            if (sender == difficult) mainWindow.init(3);
+            else if (sender == middle) mainWindow.init(2);
+            else if (sender == eazy) mainWindow.init(1);
             mainWindow.Visibility = Visibility.Visible;
             Close();
         }

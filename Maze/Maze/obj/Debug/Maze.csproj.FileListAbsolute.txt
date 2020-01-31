@@ -34,3 +34,5 @@ D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\RankList.g.cs
 D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\RankList.baml
 D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\DifficultySelect.g.cs
 D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\DifficultySelect.baml
+D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\Success.g.cs
+D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\Success.baml
