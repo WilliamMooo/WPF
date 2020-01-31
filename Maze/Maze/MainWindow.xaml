@@ -28,11 +28,11 @@
                 <Rectangle Fill="Yellow" Margin="98,150,83,300" Width="18px"/>
             </Grid>
             <Label Margin="0,185,0,254">倒计时(秒)：</Label>
-            <Label Name="time" Margin="69,185,-59,254">0</Label>
+            <Label Name="time" Margin="69,185,-59,254">60</Label>
             <Button Name="rank" Width="200px" Height="40px" Click="Rank_Click" Margin="0,225,0,184">排行榜</Button>
             <Button Name="recreate" Width="200px" Height="40px" Click="Recreate_Click" Margin="0,285,0,133">重新开始</Button>
             <Button Name="about" Width="200px" Height="40px" Click="About_Click" Margin="0,345,0,72">说明</Button>
-            <Button Name="exit" Width="200px" Height="40px" Click="Exit_Click" Margin="0,405,0,16">退出</Button>
+            <Button Name="pause" Width="200px" Height="40px" Click="Exit_Click" Margin="0,405,0,16">暂停</Button>
         </Canvas>
     </Grid>
 </Window>

@@ -31,6 +31,7 @@ namespace Maze
             if (sender == difficult) mainWindow.init(2);
             else if (sender == middle) mainWindow.init(1);
             else if (sender == eazy) mainWindow.init(0);
+            mainWindow.Visibility = Visibility.Visible;
             Close();
         }
     }

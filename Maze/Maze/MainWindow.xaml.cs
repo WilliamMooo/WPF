@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace Maze
 {
@@ -23,6 +19,7 @@ namespace Maze
         private Maze_Grid[,] g;
         private Player A;
         private Rectangle P;
+        private DispatcherTimer dispatcherTimer;
         public MainWindow()
         {
             InitializeComponent();
@@ -77,11 +74,43 @@ namespace Maze
         // 第一次进入游戏
         private void entry()
         {
+            // 连接数据库
+            string s ="Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Desktop\\maze\\WPF\\Maze\\Maze\\data\\rank_list.mdf;Integrated Security=True;Connect Timeout=30";
+            SqlConnection conn = new SqlConnection(s); //创建一个连接实例
+            //string queryStr = "SELECT * FROM Users";
+            SqlCommand query = new SqlCommand(queryStr, conn);
+            conn.Open(); //打开连接
+            SqlDataReader res = query.ExecuteReader();
+            MessageBox.Show(res.GetSqlString(0).ToString());
+            conn.Close(); //关闭连接
             // 先介绍游戏规则
-            About_Click(about, null);
+            About_Click(null, null);
             // 进行难度选择
             DifficultySelect d1 = new DifficultySelect(this);
             d1.ShowDialog();
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0,0,1);
+            dispatcherTimer.Start();
+        }
+
+        // 倒计时
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            double timeLeft = Convert.ToDouble(time.Content);
+            time.Content = (timeLeft - 0.01).ToString();
+            if (timeLeft == 59.01)
+            {
+                MessageBox.Show("时间到，尝试降低难度吧！");
+                time.Content = 60.ToString(); // 重置计时器
+                // 重置迷宫
+                Maze.ColumnDefinitions.RemoveRange(0, g.GetLength(0));
+                Maze.RowDefinitions.RemoveRange(0, g.GetLength(1));
+                this.Visibility = Visibility.Hidden;
+                // 进行难度选择
+                DifficultySelect d1 = new DifficultySelect(this);
+                d1.ShowDialog();
+            }
         }
 
         // 初始化迷宫游戏
@@ -276,11 +305,20 @@ namespace Maze
 
         private void Recreate_Click(object sender, RoutedEventArgs e)
         {
-            Maze.ColumnDefinitions.RemoveRange(0, g.GetLength(0));
-            Maze.RowDefinitions.RemoveRange(0,g.GetLength(1));
-            // 进行难度选择
-            DifficultySelect d1 = new DifficultySelect(this);
-            d1.ShowDialog();
+            // 暂停并询问是否继续
+            dispatcherTimer.Stop();
+            if (MessageBox.Show("是否要重新开始？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+            {
+                time.Content = 60.ToString(); // 重置计时器
+                // 重置迷宫
+                Maze.ColumnDefinitions.RemoveRange(0, g.GetLength(0));
+                Maze.RowDefinitions.RemoveRange(0, g.GetLength(1));
+                this.Visibility = Visibility.Hidden;
+                // 进行难度选择
+                DifficultySelect d1 = new DifficultySelect(this);
+                d1.ShowDialog();
+            }
+            dispatcherTimer.Start();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -328,7 +366,16 @@ namespace Maze
         // 退出程序
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
+            if (pause.Content.ToString() == "暂停")
+            {
+                dispatcherTimer.Stop();
+                pause.Content = "恢复";
+            }
+            else
+            {
+                dispatcherTimer.Start();
+                pause.Content = "暂停";
+            }
         }
 
         // 规则
