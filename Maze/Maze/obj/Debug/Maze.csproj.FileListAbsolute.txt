@@ -36,3 +36,5 @@ D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\DifficultySelect.g.cs
 D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\DifficultySelect.baml
 D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\Success.g.cs
 D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\Success.baml
+D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\Route.g.cs
+D:\Desktop\maze\WPF\Maze\Maze\obj\Debug\Route.baml

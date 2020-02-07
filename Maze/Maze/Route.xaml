@@ -1,0 +1,20 @@
+﻿<Window x:Class="Maze.Route"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Maze"
+        mc:Ignorable="d"
+        Title="Route" Height="600" Width="700">
+    <Grid>
+        <Label Content="过关路线" HorizontalAlignment="Left" Margin="270,16,0,0" VerticalAlignment="Top" FontSize="36"/>
+        <Grid Name="Maze" Width="550px" Height="420px" Margin="71,97,71,53">
+            <Grid.RowDefinitions>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+        </Grid>
+    </Grid>
+</Window>

@@ -20,13 +20,16 @@ namespace Maze
         private Player A; // 玩家
         private Rectangle P; // 在图形界面中显示玩家
         private DispatcherTimer dispatcherTimer; // 计时器
-        private bool isPause;
+        private bool isPause; // 判断游戏是否为暂停状态
+        private Maze_Game Maze_; // 游戏结果
+
         public MainWindow()
         {
             InitializeComponent();
             entry();
         }
-        private class Point
+
+        abstract private class Point // 坐标点
         {
             protected int x;
             protected int y; // 表示网格的坐标
@@ -45,37 +48,55 @@ namespace Maze
                 x = xi;
                 y = yi;
             }
+            virtual public bool isOut() { return false; } // 判断该点是否为终点
         }
 
-        private class Maze_Grid : Point
+        private class Maze_Grid : Point // 迷宫网格
         {
             public bool isConnected { set; get; } // 判断网格是否连通
             public bool Visited { get; set; } // 用于深度优先遍历
             public Maze_Grid(int xi, int yi) : base(xi, yi) { }
         }
 
-        private class Player : Point
+        private class Path : Maze_Grid // 通路
+        {
+            public Path(int xi, int yi, bool co) : base(xi, yi) { isConnected = co; }
+        }
+
+        private class Wall : Maze_Grid // 墙
+        {
+            public Wall(int xi, int yi, bool co) : base(xi, yi) { isConnected = co; }
+        }
+
+        private class Maze_Game
+        {
+            private int difficulty; // 难度系数
+            public double Score { get; private set; } // 玩家得分
+            public void caculateScore(double time) { Score = difficulty * time; } // 计算玩家得分
+            public List<Path> paths;
+            public List<Wall> walls;
+            public List<int> route; // 玩家过关路线
+            public Maze_Game(int di) { difficulty = di; }
+        }
+
+        private class Player : Point // 玩家
         {
             private int xout;
             private int yout; // 终点
-            private int difficulty; // 难度系数
-            public string Name { set; get; }
-            public double Score { get; private set; } // 玩家得分
             public double xstep { get; set; } // x轴上的步长
             public double ystep { get; set; } // y轴上的步长
+            public string Name { set; get; } // 姓名
             public void MoveToLeft() { x = x - 1; }
             public void MoveToTop() { y = y - 1; }
             public void MoveToRight() { x = x + 1; }
             public void MoveToBottom() { y = y + 1; } // 玩家移动
-            public bool IsOut() // 判断玩家当前位置是否为终点
+            override public bool isOut() // 判断玩家当前位置是否为终点
             {
                 if (x == xout && y == yout) return true;
                 else return false;
             }
-            public void caculateScore(double time) { Score = difficulty * time; MessageBox.Show(Score.ToString()); } // 计算玩家得分
-            public Player(int xi, int yi, int xo, int yo, int di) : base(xi, xi) { xout = xo; yout = yo; difficulty = di; }
+            public Player(int xi, int yi, int xo, int yo) : base(xi, xi) { xout = xo; yout = yo; }
         }
-
 
         // 第一次进入游戏
         private void entry()
@@ -93,8 +114,6 @@ namespace Maze
             dispatcherTimer.Start();
             isPause = false;
         }
-
-
 
         // 倒计时
         private void dispatcherTimer_Tick(object sender, EventArgs e)
@@ -141,10 +160,12 @@ namespace Maze
             initGrid(Columns, Rows);
             // 用深度优先遍历法生成迷宫形状
             DFS(1, 1, Columns, Rows);
+            // 记录迷宫形状
+            mazeShape(Columns, Rows, difficulty);
             // 画出迷宫
             drawMaze(Columns, Rows);
-            // 初始化玩家
-            initPlayer(1, 1, Columns, Rows, difficulty);
+            // 初始化游戏玩家
+            initPlayer(1, 1, Columns, Rows);
             // 初始化终点
             initEnd(Columns, Rows);
         }
@@ -160,9 +181,9 @@ namespace Maze
         }
 
         // 初始化玩家
-        private void initPlayer(int x, int y, int Columns, int Rows, int diff)
+        private void initPlayer(int x, int y, int Columns, int Rows)
         {
-            A = new Player(x, y, Columns-2, Rows-2, diff);
+            A = new Player(x, y, Columns-2, Rows-2);
             // 在界面中显示玩家位置
             A.xstep = Maze.Width / Columns;
             A.ystep = Maze.Height / Rows;
@@ -306,9 +327,34 @@ namespace Maze
             }
         }
 
+        private void mazeShape(int Columns, int Rows, int diff)
+        {
+            Maze_ = new Maze_Game(diff);
+            Maze_.walls = new List<Wall>();
+            Maze_.paths = new List<Path>();
+            Maze_.route = new List<int>();
+            for (int i = 0; i < Columns; i++)
+            {
+                for (int j = 0; j < Rows; j++)
+                {
+                    if (g[i,j].isConnected == true)
+                    {
+                        Path t = new Path(g[i, j].X, g[i, j].Y, g[i, j].isConnected);
+                        g[i, j] = t;
+                        Maze_.paths.Add(t);
+                    } else
+                    {
+                        Wall t = new Wall(g[i, j].X, g[i, j].Y, g[i, j].isConnected);
+                        g[i, j] = t;
+                        Maze_.walls.Add(t);
+                    }
+                }
+            }
+        }
+
         private void RecreateMaze()
         {
-            time.Content = 60.ToString(); // 重置计时器
+            time.Content = 60.ToString(); // 重置计时
             // 重置迷宫
             Maze.ColumnDefinitions.RemoveRange(0, g.GetLength(0));
             Maze.RowDefinitions.RemoveRange(0, g.GetLength(1));
@@ -341,6 +387,8 @@ namespace Maze
                         move = new Thickness(P.Margin.Left - A.xstep, P.Margin.Top, P.Margin.Right + A.xstep, P.Margin.Bottom);
                         A.MoveToLeft();
                         P.Margin = move;
+                        Maze_.route.Add(A.X);
+                        Maze_.route.Add(A.Y);
                     }
                 }
                 else if (Keyboard.IsKeyDown(Key.Up)) // 上方向键
@@ -350,6 +398,8 @@ namespace Maze
                         move = new Thickness(P.Margin.Left, P.Margin.Top - A.ystep, P.Margin.Right, P.Margin.Bottom + A.ystep);
                         A.MoveToTop();
                         P.Margin = move;
+                        Maze_.route.Add(A.X);
+                        Maze_.route.Add(A.Y);
                     }
                 }
                 else if (Keyboard.IsKeyDown(Key.Right)) // 右方向键
@@ -359,6 +409,8 @@ namespace Maze
                         move = new Thickness(P.Margin.Left + A.xstep, P.Margin.Top, P.Margin.Right - A.xstep, P.Margin.Bottom);
                         A.MoveToRight();
                         P.Margin = move;
+                        Maze_.route.Add(A.X);
+                        Maze_.route.Add(A.Y);
                     }
                 }
                 else if (Keyboard.IsKeyDown(Key.Down)) // 下方向键
@@ -368,14 +420,16 @@ namespace Maze
                         move = new Thickness(P.Margin.Left, P.Margin.Top + A.ystep, P.Margin.Right, P.Margin.Bottom - A.ystep);
                         A.MoveToBottom();
                         P.Margin = move;
+                        Maze_.route.Add(A.X);
+                        Maze_.route.Add(A.Y);
                     }
                 }
                 // 玩家到达终点
-                if (A.IsOut() == true)
+                if (A.isOut() == true)
                 {
                     Pause_Click(null, null);
-                    A.caculateScore(Convert.ToDouble(time.Content));
-                    if (MessageBox.Show("恭喜闯关成功，你的成绩为"+A.Score+",是否上传成绩？否则重新开始。", "提示", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                    Maze_.caculateScore(Convert.ToDouble(time.Content));
+                    if (MessageBox.Show("恭喜闯关成功，你的成绩为"+ Maze_.Score+",是否上传成绩？否则重新开始。", "提示", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
                     {
                         RecreateMaze();
                         Visibility = Visibility.Hidden;
@@ -440,10 +494,17 @@ namespace Maze
             try
             {
                 A.Name = scc.name;
+                string route = "";
+                for (int i = 0; i < Maze_.route.Count; i++) { route += Maze_.route[i].ToString() + ","; }
+                string walls = "";
+                for (int i = 0; i < Maze_.walls.Count; i++) { walls += Maze_.walls[i].X + "," + Maze_.walls[i].Y + ","; }
+                string paths = "";
+                for (int i = 0; i < Maze_.paths.Count; i++) { paths += Maze_.paths[i].X + "," + Maze_.paths[i].Y + ","; }
                 // 连接数据库
                 string s = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Desktop\\maze\\WPF\\Maze\\Maze\\data\\rank_list.mdf;Integrated Security=True;Connect Timeout=30";
                 SqlConnection conn = new SqlConnection(s); //创建一个连接实例
-                string insertStr = "INSERT INTO [dbo].[Users] ([Name], [MaxScore]) VALUES (N'" + A.Name + "', " + A.Score.ToString() + ")";
+                string insertStr = "INSERT INTO [dbo].[Users] ([Name], [MaxScore], [Route], [Wall], [Path]) " +
+                    "VALUES(N'" + A.Name + "', " + Maze_.Score.ToString() + ", N'"+ route +"', N'"+walls+ "', N'"+paths+"')";
                 SqlCommand insert = new SqlCommand(insertStr, conn);
                 conn.Open(); //打开连接
                 insert.ExecuteNonQuery();
