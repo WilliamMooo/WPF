@@ -317,7 +317,7 @@ namespace Maze
                 for (int j = 0; j < Rows; j++)
                 {
                     TextBlock newArea = new TextBlock();
-                    newArea.Text = i.ToString() + "," + j.ToString(); // 标出迷宫坐标
+                    // newArea.Text = i.ToString() + "," + j.ToString(); // 标出迷宫坐标
                     Maze.Children.Add(newArea);
                     Grid.SetColumn(newArea, i);
                     Grid.SetRow(newArea, j);
