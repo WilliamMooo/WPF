@@ -25,6 +25,7 @@ namespace Maze
             init(R);
         }
 
+        // 重现玩家绘制过关路线
         private void init(RankList.Record R)
         {
             string[] walls = R.getWalls().Split(',');

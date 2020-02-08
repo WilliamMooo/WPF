@@ -94,6 +94,7 @@ namespace Maze
             }
         }
 
+        // 查询历史数据
         public Record[] ReadRecord()
         {
             // 连接数据库
